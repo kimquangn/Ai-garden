@@ -1,0 +1,92 @@
+/* Crop Wiki: one screen per crop, vertical snap scroll. Pairs with tokens.css / style.css / site.css (v4). */
+/* Bar heights: --hdr is the fixed site header, --idx the sticky crop index. wiki.js keeps both in sync with the rendered heights. */
+:root{--hdr:54px;--idx:43px;--bars:calc(var(--hdr) + var(--idx));--gap:14px;--off:calc(var(--bars) + var(--gap))}
+html{scroll-snap-type:y proximity;scroll-padding-top:var(--off)}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+.wk{max-width:1180px;margin:0 auto;padding:calc(var(--hdr) + 56px) 5vw 60px}
+.wk .s{padding:0 0 4vh}
+.wk h2{font-size:clamp(24px,3vw,34px);margin-top:8px}
+.ja{font-weight:400;color:var(--d7);font-size:.6em;margin-left:10px;vertical-align:middle}
+.hero{display:grid;grid-template-columns:1fr 38.2%;gap:28px;align-items:center}
+.hero .fig{aspect-ratio:900/1309;max-height:none;width:min(100%,calc(52vh * 900 / 1309));justify-self:end}
+.note{font-size:13px;color:var(--d7)}
+
+/* kids section (verbatim research package) */
+/* no scroll-margin here: the root scroll-padding-top already clears the header + index (adding both doubled the gap) */
+#kids-ranking{margin:26px 0 10px}
+.rankwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;
+ /* overflow cue: edge shadows that appear only while there is more table to scroll to */
+ background:linear-gradient(90deg,#FBFBF9 30%,rgba(251,251,249,0)) left/36px 100% no-repeat local,
+  linear-gradient(270deg,#FBFBF9 30%,rgba(251,251,249,0)) right/36px 100% no-repeat local,
+  radial-gradient(farthest-side at 0 50%,rgba(40,40,38,.22),rgba(40,40,38,0)) left/12px 100% no-repeat scroll,
+  radial-gradient(farthest-side at 100% 50%,rgba(40,40,38,.22),rgba(40,40,38,0)) right/12px 100% no-repeat scroll}
+.rankwrap:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.rank{width:100%;min-width:560px;border-collapse:collapse;font-size:14px;margin-top:14px}
+.rank th{text-align:left;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--d8);font-weight:500;padding:10px 8px;border-bottom:1px solid var(--d5)}
+.rank td{padding:14px 8px;color:var(--d7);border-bottom:.75px solid var(--d4)}
+.rank td.empty{text-align:center;font-style:italic}
+.srcs{font-size:13.5px;color:var(--d8);line-height:1.55}
+
+/* sticky index: one scrollable row of chips on every width */
+.idx{position:sticky;top:var(--hdr);z-index:40;margin:10px -5vw 18px;padding:8px 5vw;background:rgba(246,246,244,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.idx .row{position:relative;display:flex;align-items:center;gap:6px;margin:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}.idx .row::-webkit-scrollbar{display:none}
+.idx .gl{flex:none;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--d7);margin:0 4px 0 10px}.idx .gl:first-child{margin-left:0}
+.chip{flex:none;display:inline-block;font-size:12.5px;padding:5px 11px;border-radius:999px;background:var(--d3);color:var(--d8);text-decoration:none;white-space:nowrap;line-height:1.2}
+.chip:hover{background:var(--d4)}.chip[aria-current]{background:var(--ink);color:#fff}
+/* overflow hint: right-edge fade + label while more chips sit off-screen (wiki.js sets .more on .idx) */
+.idx::after{content:"scroll \2192";position:absolute;top:0;bottom:0;right:0;width:118px;display:flex;align-items:center;justify-content:flex-end;padding-right:max(10px,2vw);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--d7);pointer-events:none;background:linear-gradient(90deg,rgba(246,246,244,0),rgba(246,246,244,.98) 40%);opacity:0;transition:opacity .2s}
+.idx.more::after{opacity:1}
+
+/* season headers: scroll targets sit under the bars via the root scroll-padding; no negative margins */
+.sh{scroll-snap-align:start;padding:34px 0 0;margin-bottom:0}.sh h2{margin:0}.sh p{color:var(--d7);margin:4px 0 0;font-size:14px}
+
+/* one crop per screen: the screen is what is left under the sticky bars; image and heading share the top edge */
+.crop{min-height:calc(100vh - var(--off));min-height:calc(100svh - var(--off));scroll-snap-align:start;display:grid;grid-template-columns:38.2% minmax(0,1fr);gap:28px;align-items:start;padding:18px 0 26px}
+.crop>*{min-width:0}.crop .txt{min-width:0;overflow-wrap:break-word}
+.crop .fig{position:sticky;top:calc(var(--off) + 18px);margin-top:0}
+.fig{position:relative;margin:0;width:min(100%,calc(78svh * 900 / 1309));aspect-ratio:900/1309;border-radius:var(--r-card);overflow:hidden;background:var(--face-in);box-shadow:var(--sh-rest)}
+.fig img{width:100%;height:100%;display:block;object-fit:contain;object-position:50% 50%}
+.fig.dual{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--d3)}
+.fig.quad{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;background:var(--d3)}
+.fig.dual img,.fig.quad img{object-fit:cover;object-position:50% 100%}
+.fig .ph{display:none;position:absolute;inset:0;align-items:flex-end;justify-content:center;padding:18px;text-align:center;background:radial-gradient(70% 55% at 50% 0%,#F7F9FB,#ECECEA 70%,#E2E1DD 100%);color:var(--d6);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase}
+.fig .ph i{display:block;width:34px;height:34px;border-radius:50%;background:var(--leaf-hi);box-shadow:var(--glow-halo) var(--leaf-hi);opacity:.6;margin:0 auto 10px}
+.fig .missing{display:none}.fig .ph.on{display:flex;flex-direction:column}
+.fig figcaption{position:absolute;left:12px;bottom:10px;font:10.5px var(--mono);color:var(--d6);background:rgba(250,250,248,.7);padding:3px 8px;border-radius:999px}
+.txt .lab{margin-top:0;margin-bottom:2px}
+.txt h2{margin:4px 0 8px}
+.txt .intro{margin:0 0 12px;line-height:1.55;color:var(--d8);max-width:620px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin:0 0 12px;font-size:13.5px}
+.kv div{padding:8px 0;border-top:.75px solid var(--d4)}.kv b{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--d7);font-weight:400;margin-bottom:2px}.kv span{color:var(--d8);line-height:1.45}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cols h3{font-size:13px;margin:0 0 4px}.cols ul{margin:0;padding-left:18px}.cols li{font-size:13.5px;line-height:1.5;color:var(--d8);margin:3px 0}
+.aibox{background:var(--face);box-shadow:var(--sh-rest);border-radius:var(--r-card);padding:14px 18px}
+.kids{margin-top:12px;display:flex;gap:12px;align-items:flex-start;padding:10px 14px;border-radius:var(--r-ctl);background:var(--face-in);box-shadow:var(--sh-in)}
+.kids .tbc{flex:none;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:#F2C94C;color:var(--ink)}
+.kids p{margin:0;font-size:13px;line-height:1.5;color:var(--d7)}.kids b{color:var(--d8);font-weight:500}
+.ptag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:999px;background:var(--d3);color:var(--d7);margin-left:6px;vertical-align:middle}
+.ptag.on{background:#DDEFE0;color:#1f5a2c}
+
+/* phones: no snapping (a crop spans several screens), one column, and the whole plant shown at the render's own ratio */
+@media(max-width:900px){html{scroll-snap-type:none}
+ .crop{grid-template-columns:minmax(0,1fr);gap:14px;align-items:start;min-height:0;padding:16px 0 18px}
+ .crop .fig{position:relative;top:auto;margin-top:0}
+ .fig{aspect-ratio:900/1309;height:auto;max-height:none;width:min(100%,calc(50svh * 900 / 1309));margin:0 auto;border-radius:16px}
+ .fig.dual{aspect-ratio:1800/1309;width:100%}.fig.dual img,.fig.quad img{object-fit:contain;object-position:50% 50%}
+ .fig figcaption{left:auto;right:10px;top:10px;bottom:auto}
+ .hero{grid-template-columns:1fr}.hero .fig{width:min(100%,calc(40svh * 900 / 1309));max-height:none;order:-1}
+ .cols{grid-template-columns:1fr}.kv{grid-template-columns:1fr 1fr}
+ .idx{margin:8px -5vw 10px}.sh{padding-top:30px}
+ /* phone tap targets: 44px chips; label says swipe */
+ .chip{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;font-size:13px}
+ .idx::after{content:"swipe \2192"}}
+@media(max-width:560px){.kv{grid-template-columns:1fr}}
+
+/* verbatim kids package */
+.verb h3{font-size:15px;margin:22px 0 6px}.verb p{font-size:14px;line-height:1.55;color:var(--d8);margin:8px 0}
+ul.verb{padding-left:20px;margin:6px 0}ul.verb li{font-size:14px;line-height:1.55;color:var(--d8);margin:6px 0}ul.verb li p{margin:4px 0}
+.rank.verb{font-size:13px;min-width:640px}.rank.verb td{color:var(--d8);padding:8px 8px;vertical-align:top}.rank.verb th{padding:8px}.rank.verb a{word-break:break-all}
+.verb a,.kids a{overflow-wrap:anywhere;word-break:break-word}
+.kids{min-width:0;max-width:100%}.kids .tbc{max-width:100%;white-space:normal}
+.kids .kb{min-width:0}.kids .kb p{margin:0 0 6px}.kids .kb p:last-child{margin:0}
+@media(max-width:600px){.kids{flex-direction:column}}

@@ -28,6 +28,19 @@
  .bs{min-height:auto;padding:6vh 0 12vh}
  .bs .card{padding:18px 18px}
 }
-@media(max-width:760px){.step{scroll-margin-top:40vh}.bhead{padding-top:80px}}
+@media(max-width:760px){.bhead{padding-top:80px}}
 .bs .card{opacity:.55}
 @media(max-width:760px){.bs{padding:3vh 0 6vh}.bs .card{opacity:.7}#stage img.bg{object-position:50% 66%}}
+.bs{scroll-margin-top:70px}
+/* phone render: one inline 4:3 render per step (built in build.js); hidden on desktop where the sticky #stage is used */
+.bimg{display:none;position:relative;margin:4px 0 12px;aspect-ratio:4/3;border-radius:16px;overflow:hidden;background:#ccc}
+.bimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bimg i{position:absolute;inset:0;background:rgba(18,20,22,.55);pointer-events:none}
+@media(max-width:760px){
+ /* phones: no sticky render, so it can never cover step text or the closing links */
+ #stage{display:none}
+ .bimg{display:block}
+ #steps{padding:2vh 4vw 4vh}
+ .bs{padding:2vh 0 3vh}
+ .bs .card{opacity:1}
+}

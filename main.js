@@ -10,21 +10,22 @@ const STOPS=[
  {u:.40,v:.30,z:1.55,t:'Camera: rough timing prompts (planned)',c:'A daily photo shows growth. The app gives a heads-up when it\'s about time to thin fruit or pinch side shoots. A nudge, not per-fruit instructions.'},
  {u:.86,v:.62,z:2.05,t:'Harvest, Brix and records',c:'Days to first pick, then every harvest logged with weight and Brix, so next season copies what made the sweetest fruit.'},
  {u:.5,v:.5,z:1.0,t:'',c:''}];
-const img=document.getElementById('dash'),hero=document.getElementById('hero'),cap=document.getElementById('cap'),spot=document.getElementById('spot'),intro=document.getElementById('intro');
+const img=document.getElementById('dash'),hero=document.getElementById('hero'),cap=document.getElementById('cap'),spot=document.getElementById('spot');
 if(!img)return;
+// On phones (<=760px) the hero is hidden and a static stack of panel crops is shown instead (CSS .ptour), so there is nothing to animate.
+const phoneMQ=matchMedia('(max-width:760px)');
 const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let cur={u:.5,v:.5,z:1},last=null,raf=0,sp=0;
-function tgt(){const r=hero.getBoundingClientRect(),tot=r.height-innerHeight;const pr=Math.min(Math.max(-r.top/tot,0),1);
- intro.style.opacity=Math.max(0,1-pr*14);
+function tgt(){const r=hero.getBoundingClientRect(),tot=Math.max(1,r.height-innerHeight);const pr=Math.min(Math.max(-r.top/tot,0),1);
  const p=pr*(STOPS.length-1),i=Math.min(Math.floor(p),STOPS.length-2),f=p-i,k=ease(Math.min(Math.max((f-.45)/.55,0),1));
  const a=STOPS[i],b=STOPS[i+1],near=k<.5?a:b;
  if(near!==last){last=near;cap.querySelector('h3').textContent=near.t;cap.querySelector('p').textContent=near.c;cap.dataset.side=near.u<.45?'right':'left';cap.dataset.pos=near.v>.7?'top':'bottom';}
  const show=(k<.15||k>.85)&&!!near.t;cap.style.opacity=show?1:0;
  return {t:{u:a.u+(b.u-a.u)*k,v:a.v+(b.v-a.v)*k,z:a.z+(b.z-a.z)*k},near,hold:near.t?Math.max(0,1-Math.min(k,1-k)*2/.35):0};}
-function frame(){raf=0;const W=innerWidth,H=innerHeight,{t,near,hold}=tgt();
+function frame(){raf=0;if(phoneMQ.matches)return;const W=innerWidth,H=innerHeight,{t,near,hold}=tgt();
  for(const q of['u','v','z'])cur[q]+=reduce?(t[q]-cur[q]):(t[q]-cur[q])*.14;
- const phone=W<760, s0=phone?Math.max(W/IW,H*.5/IH):Math.min(W/IW,H/IH), s=s0*cur.z, w=IW*s,h=IH*s;
+ const s0=Math.min(W/IW,H/IH), s=s0*cur.z, w=IW*s,h=IH*s;
  let tx=W/2-cur.u*w,ty=H/2-cur.v*h;
  tx=w>W?Math.min(0,Math.max(W-w,tx)):(W-w)/2; ty=h>H?Math.min(0,Math.max(H-h,ty)):(H-h)/2;
  img.style.transform=`translate3d(${tx}px,${ty}px,0) scale(${s})`;
