@@ -2,9 +2,9 @@
 .bnav a{color:var(--ink);text-decoration:none}.bnav .pill{background:var(--ink);color:#fff;padding:7px 14px;border-radius:999px}
 #bw{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:4vw;max-width:1280px;margin:0 auto;padding:0 4vw}
 #stage{position:sticky;top:64px;height:calc(100vh - 84px);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--sh-lift);background:#ccc}
-#stage img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%;opacity:0;transition:opacity .7s ease}
+#stage img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%;opacity:0;transition:opacity .7s ease,transform 1.4s ease,width .8s ease,height .8s ease,left .8s ease,top .8s ease}
 #stage img.bg.on{opacity:1}
-#bspot{position:absolute;inset:0;pointer-events:none;background:rgba(18,20,22,.55);-webkit-backdrop-filter:grayscale(.9);backdrop-filter:grayscale(.9);transition:opacity .6s;opacity:0}
+#bspot{display:none}
 #tag{position:absolute;left:14px;top:14px;font:11px var(--mono);background:rgba(250,250,248,.9);padding:5px 10px;border-radius:999px}
 #fin{position:absolute;right:10px;bottom:10px;display:flex;gap:4px;background:rgba(250,250,248,.92);padding:4px;border-radius:999px;box-shadow:var(--sh-rest)}
 #fin button{border:0;background:none;font:12px var(--font);padding:6px 10px;border-radius:999px;color:var(--d8);cursor:pointer}
@@ -32,10 +32,9 @@
 .bs .card{opacity:.55}
 @media(max-width:760px){.bs{padding:3vh 0 6vh}.bs .card{opacity:.7}#stage img.bg{object-position:50% 66%}}
 .bs{scroll-margin-top:70px}
-/* phone render: one inline 4:3 render per step (built in build.js); hidden on desktop where the sticky #stage is used */
+/* phone render: one inline render per step, 4:3 unless the step sets view.aspect (built in build.js); hidden on desktop where the sticky #stage is used */
 .bimg{display:none;position:relative;margin:4px 0 12px;aspect-ratio:4/3;border-radius:16px;overflow:hidden;background:#ccc}
-.bimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.bimg i{position:absolute;inset:0;background:rgba(18,20,22,.55);pointer-events:none}
+.bimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 70%}
 @media(max-width:760px){
  /* phones: no sticky render, so it can never cover step text or the closing links */
  #stage{display:none}
@@ -44,3 +43,5 @@
  .bs{padding:2vh 0 3vh}
  .bs .card{opacity:1}
 }
+/* reduced motion: no zoom (also skipped in build.js), no fades; crops still apply */
+@media(prefers-reduced-motion:reduce){#stage img.bg,.bs .card{transition:none;animation:none}}

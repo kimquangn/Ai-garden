@@ -8,28 +8,35 @@ const imgs={};for(const s of srcs){const i=new Image();i.className='bg';i.decodi
 const num=Object.fromEntries(STEPS.map((s,i)=>[s.id,i+1]));
 const xref=t=>t.replace(/\{step:([\w-]+)\}/g,(m,id)=>`<a href="#step-${id}">${num[id]}</a>`);
 // Phone (<=760px): the sticky #stage is hidden by CSS; each step gets its own inline render instead,
-// cropped around the step's focus point, so the render never sits on top of the text.
+// clean by default, framed by the step's view.phone crop (see frame()), so the render never sits on top of the text.
 function phoneFig(s){
-  const f=s.stage.replace('{F}',fin);let pos='50% 50%',ov='';
-  if(s.focus){const [x,y,rad]=s.focus,py=Math.min(Math.max((y/768-.375)/(4/3-.75),0),1);
-    const cy=((.75-4/3)*py+y/768)/.75*100,rw=Math.max(rad/768,.2)*100,rh=rw*.8/.75;
-    pos=`${(x/768*100).toFixed(1)}% ${(py*100).toFixed(1)}%`;
-    ov=`<i style="-webkit-mask-image:radial-gradient(${rw.toFixed(1)}% ${rh.toFixed(1)}% at ${(x/768*100).toFixed(1)}% ${cy.toFixed(1)}%,transparent 0,transparent 55%,#000 100%);mask-image:radial-gradient(${rw.toFixed(1)}% ${rh.toFixed(1)}% at ${(x/768*100).toFixed(1)}% ${cy.toFixed(1)}%,transparent 0,transparent 55%,#000 100%)"></i>`;}
-  else if(s.soft)ov='<i style="opacity:.35"></i>';
-  return `<figure class=bimg data-src="${s.stage}"><img src="build/${f}" alt="" loading=lazy decoding=async style="object-position:${pos}">${ov}</figure>`;
+  const f=s.stage.replace('{F}',fin),a=s.view?.aspect?` style="aspect-ratio:${s.view.aspect}"`:'';
+  return `<figure class=bimg data-src="${s.stage}"${a}><img src="build/${f}" alt="" loading=lazy decoding=async></figure>`;
 }
 wrap.innerHTML=STEPS.map((s,i)=>`<section class=bs id="step-${s.id}" data-i=${i}><div class=card><div class=lab>Step ${i+1} · ${s.lab}</div><h2>${s.t}</h2>${phoneFig(s)}${xref(s.body)}${s.dg?DG[s.dg]:''}</div></section>`).join('');
 fb.innerHTML=FINISHES.map(f=>`<button data-k=${f.key}>${f.label}</button>`).join('');
 fb.onclick=e=>{const k=e.target.dataset.k;if(k){fin=k;apply(true);}};
 const secs=[...wrap.querySelectorAll('.bs')];let cur=-1;
 function src(s){return s.stage.replace('{F}',fin);}
-function focus(s){
-  if(!s.focus){spot.style.opacity=s.soft?.35:0;spot.style.webkitMaskImage=spot.style.maskImage='none';return;}
-  const r=stage.getBoundingClientRect(),sc=Math.max(r.width/768,r.height/1024);
-  const ox=(r.width-768*sc)*.5,oy=(r.height-1024*sc)*(innerWidth<=760?.66:.55);
-  const [x,y,rad]=s.focus,cx=ox+x*sc,cy=oy+y*sc,R=Math.max(rad*sc,70);
-  const m=`radial-gradient(${R}px ${R*.8}px at ${cx}px ${cy}px,transparent 0,transparent 55%,#000 100%)`;
-  spot.style.webkitMaskImage=spot.style.maskImage=m;spot.style.opacity=1;
+const still=matchMedia('(prefers-reduced-motion: reduce)');
+// Crop c=[x,y,w,h] in source px: scale so the whole crop fits the box (never below plain cover, at most 1.6x it),
+// centre on the crop, clamp so no edge shows. No crop or hidden box: clear inline sizes so CSS gives the clean cover render.
+function fit(im,box,c){
+  const W=box.clientWidth,H=box.clientHeight,iw=im.naturalWidth||768,ih=im.naturalHeight||1024,st=im.style;
+  if(!c||!W||!H){st.width=st.height=st.left=st.top='';return null;}
+  const cov=Math.max(W/iw,H/ih),k=Math.min(Math.max(cov,Math.min(W/c[2],H/c[3])),cov*1.6);
+  const cx=(c[0]+c[2]/2)*k,cy=(c[1]+c[3]/2)*k;
+  st.width=iw*k+'px';st.height=ih*k+'px';
+  st.left=Math.min(Math.max(W/2-cx,W-iw*k),0)+'px';st.top=Math.min(Math.max(H/2-cy,H-ih*k),0)+'px';
+  return `${cx}px ${cy}px`;
+}
+// Frame a step's phone render, and the sticky render if it's the active step. Desktop crops count as detail steps:
+// one small zoom on activation (CSS transition, not scroll-driven), skipped for reduced motion.
+function frame(s){
+  const fg=document.querySelector(`#step-${s.id} .bimg`);if(fg)fit(fg.firstChild,fg,s.view?.phone);
+  if(s!==STEPS[cur])return;
+  for(const k in imgs){const im=imgs[k];if(k!==src(s)){im.style.transform='';continue;}
+    const o=fit(im,stage,s.view?.desk);im.style.transformOrigin=o||'';im.style.transform=o&&!still.matches?'scale(1.04)':'';}
 }
 function apply(force){
   const s=STEPS[cur];if(!s)return;
@@ -40,7 +47,7 @@ function apply(force){
   fb.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.k===fin));
   document.querySelectorAll('[data-show]').forEach(g=>g.style.display=g.dataset.show.includes(fin)?'':'none');
   document.querySelectorAll('[data-fin]').forEach(p=>p.textContent=FINISHES.find(f=>f.key===fin).desc);
-  focus(s);
+  frame(s);
 }
 function tick(){
   const mid=innerWidth<=760?innerHeight*.72:innerHeight*.5;let best=0,bd=1e9;
@@ -50,7 +57,10 @@ function tick(){
   if(best!==cur){cur=best;secs.forEach((e,i)=>e.classList.toggle('act',i===cur));apply();}
 }
 let q=0;addEventListener('scroll',()=>{if(!q){q=1;requestAnimationFrame(()=>{q=0;tick();});}},{passive:true});
-addEventListener('resize',()=>{tick();apply();});tick();
+wrap.querySelectorAll('.bimg img').forEach((im,i)=>im.addEventListener('load',()=>frame(STEPS[i])));
+for(const k in imgs)imgs[k].addEventListener('load',()=>{if(STEPS[cur])frame(STEPS[cur]);});
+still.addEventListener('change',()=>{if(STEPS[cur])frame(STEPS[cur]);});
+addEventListener('resize',()=>{tick();apply();STEPS.forEach(frame);});tick();STEPS.forEach(frame);
 // steps are rendered by JS, so jump to a #step-… hash once they exist
 if(location.hash.startsWith('#step-')){const t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView();}
 window.__ready=true;
