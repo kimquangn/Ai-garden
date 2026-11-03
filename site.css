@@ -16,6 +16,7 @@ a{color:var(--leaf-deep)}
 .flow{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;counter-reset:f}.flow li{counter-increment:f}.flow .lab::before{content:counter(f)" · "}.flow p{margin:6px 0 0;line-height:1.55;color:var(--d8)}
 .tp .two{margin-top:30px}.dark p,.dark li{color:#ddd}
 .pn{display:flex;justify-content:space-between;gap:12px;margin-top:48px;padding-top:20px;border-top:.75px solid var(--d4)}.pn a{text-decoration:none;color:var(--ink);font-weight:500}
+.strip{font-size:13px;color:var(--d7);margin:-6px 0 14px}.tile .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:middle}
 .st{display:inline-block;font-size:12px;padding:4px 10px;border-radius:999px;background:var(--d3);color:var(--d8)}.st.now{background:#DDEFE0;color:#1f5a2c}.st.mix{background:#F5EBCF;color:#6b5414}.st.later{background:#E7E6E3;color:#55544f}
 .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}.tc{text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:6px;transition:transform .2s}.tc:hover{transform:translateY(-2px)}.tc p{color:var(--d8);font-size:14px;line-height:1.5;margin:0 0 6px;flex:1}.tc .go{font-size:13px;color:var(--leaf-deep);margin-top:6px}.tc .st{align-self:flex-start}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}.g4 p,.g3 p{font-size:14px;line-height:1.5;color:var(--d8)}.g3 .dark p{color:#ddd}
@@ -39,3 +40,7 @@ a{color:var(--leaf-deep)}
 .cflow li{padding:6px 0;font-size:1rem}
 @media(max-width:760px){.cdg{display:none}.cflow{display:block}}
 #hero{height:480vh}
+.season{margin:18px 0}.season input{position:absolute;opacity:0}.season label{display:inline-block;padding:8px 16px;border-radius:99px;border:1px solid #bbb;margin:0 6px 10px 0;cursor:pointer;font-weight:600}
+.season input:checked+label{background:#1B1C1E;color:#fff;border-color:#1B1C1E}.spane{display:none}#sum:checked~.sp-sum,#win:checked~.sp-win{display:block}
+.season .plan{width:100%;max-width:900px;height:auto}
+.later{font-style:normal;font-size:.75rem;background:#eee;padding:1px 6px;border-radius:99px;margin-left:4px}
