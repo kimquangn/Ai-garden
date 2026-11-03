@@ -12,7 +12,7 @@ function src(s){return s.stage.replace('{F}',fin);}
 function focus(s){
   if(!s.focus){spot.style.opacity=s.soft?.35:0;spot.style.webkitMaskImage=spot.style.maskImage='none';return;}
   const r=stage.getBoundingClientRect(),sc=Math.max(r.width/768,r.height/1024);
-  const ox=(r.width-768*sc)*.5,oy=(r.height-1024*sc)*.55;
+  const ox=(r.width-768*sc)*.5,oy=(r.height-1024*sc)*(innerWidth<=760?.66:.55);
   const [x,y,rad]=s.focus,cx=ox+x*sc,cy=oy+y*sc,R=Math.max(rad*sc,70);
   const m=`radial-gradient(${R}px ${R*.8}px at ${cx}px ${cy}px,transparent 0,transparent 55%,#000 100%)`;
   spot.style.webkitMaskImage=spot.style.maskImage=m;spot.style.opacity=1;

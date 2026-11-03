@@ -23,8 +23,11 @@
 .btn{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;padding:14px 22px;border-radius:999px;font-size:15px;margin-top:10px}
 @media(max-width:760px){
  #bw{display:block;padding:0}
- #stage{top:52px;height:46vh;border-radius:0 0 22px 22px;z-index:5}
+ #stage{top:52px;height:32vh;border-radius:0 0 22px 22px;z-index:5}
  #steps{padding:4vh 4vw 30vh}
  .bs{min-height:auto;padding:6vh 0 12vh}
  .bs .card{padding:18px 18px}
 }
+@media(max-width:760px){.step{scroll-margin-top:40vh}.bhead{padding-top:80px}}
+.bs .card{opacity:.55}
+@media(max-width:760px){.bs{padding:3vh 0 6vh}.bs .card{opacity:.7}#stage img.bg{object-position:50% 66%}}
