@@ -32,7 +32,7 @@ function resize(){renderer.setSize(innerWidth,innerHeight,false);cam.aspect=inne
 addEventListener('resize',resize);resize();
 const cap=document.getElementById('cap'),spot=document.getElementById('spot'),hero=document.getElementById('hero');
 const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-let cur={u:.5,v:.5,z:1},last=-1;
+let cur={u:.5,v:.5,z:1},last=-1,spotTarget=0,spotNow=0,spotStop=null;const _v=new THREE.Vector3();
 function target(){
   const r=hero.getBoundingClientRect();const total=r.height-innerHeight;
   const p=Math.min(Math.max(-r.top/total,0),1)*(STOPS.length-1);
@@ -42,7 +42,9 @@ function target(){
   const a=STOPS[i],b=STOPS[i+1];
   const near=k<.5?a:b, show=(k<.15||k>.85);
   if(near!==last){last=near;cap.querySelector('h3').textContent=near.t;cap.dataset.pos=near.v>.7?'top':'bottom';cap.dataset.side=near.u<.4?'right':'left';cap.querySelector('p').textContent=near.c;}
-  cap.style.opacity=(show&&near.t)?1:0; spot.style.opacity=(show&&near.t)?1:0;
+  cap.style.opacity=(show&&near.t)?1:0;
+  // spotlight strength: full while holding at a stop, fades while travelling
+  const hold=near.t?Math.max(0,1-Math.min(k,1-k)*2/0.35):0; spotTarget=Math.min(1,Math.max(0,hold)); spotStop=near;
   return {u:a.u+(b.u-a.u)*k,v:a.v+(b.v-a.v)*k,z:a.z+(b.z-a.z)*k};
 }
 renderer.setAnimationLoop(()=>{
@@ -54,5 +56,14 @@ renderer.setAnimationLoop(()=>{
   x=Math.max(-W/2+vw/2,Math.min(W/2-vw/2,x))||0;y=Math.max(-H/2+vh/2,Math.min(H/2-vh/2,y))||0;
   cam.position.set(x+ (cur.z>1.1?.02:0),y-(cur.z>1.1?.015:0),d);cam.lookAt(x,y,0); // slight parallax tilt when zoomed
   renderer.render(scene,cam);
+  spotNow+=(spotTarget-spotNow)*.15;
+  if(spotStop&&spotNow>.01){
+    _v.set((spotStop.u-.5)*W,(.5-spotStop.v)*H,0).project(cam);
+    const sx=(_v.x*.5+.5)*innerWidth,sy=(.5-_v.y*.5)*innerHeight;
+    const R=Math.max(Math.min(innerWidth,innerHeight)*.30,120);
+    const m=`radial-gradient(${R*1.25|0}px ${R|0}px at ${sx|0}px ${sy|0}px,transparent 0,transparent 50%,#000 100%)`;
+    if(spot._m!==m){spot._m=m;spot.style.webkitMaskImage=m;spot.style.maskImage=m;}
+  }
+  spot.style.opacity=spotNow.toFixed(3);
 });
 window.__ready=true;
